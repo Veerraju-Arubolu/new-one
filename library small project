@@ -1,0 +1,93 @@
+import json
+
+# Function to load data from the file
+def load_data():
+    try:
+        with open("library_data.json", "r") as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        data = {"books": []}
+    return data
+
+# Function to save data to the file
+def save_data(data):
+    with open("library_data.json", "w") as file:
+        json.dump(data, file, indent=2)
+
+# Function to display the menu
+def display_menu():
+    print("\nLibrary Management System")
+    print("1. Display Books")
+    print("2. Add Book")
+    print("3. Borrow Book")
+    print("4. Return Book")
+    print("5. Exit")
+
+# Function to display all books in the library
+def display_books(data):
+    print("\nAvailable Books:")
+    for book in data["books"]:
+        print(f"{book['title']} by {book['author']} - {book['status']}")
+
+# Function to add a new book to the library
+def add_book(data):
+    title = input("Enter the title of the book: ")
+    author = input("Enter the author of the book: ")
+    new_book = {"title": title, "author": author, "status": "Available"}
+    data["books"].append(new_book)
+    save_data(data)
+    print(f"\nBook '{title}' by {author} added successfully.")
+
+# Function to borrow a book
+def borrow_book(data):
+    display_books(data)
+    title_to_borrow = input("\nEnter the title of the book to borrow: ")
+    
+    for book in data["books"]:
+        if book["title"].lower() == title_to_borrow.lower() and book["status"] == "Available":
+            book["status"] = "Borrowed"
+            save_data(data)
+            print(f"\nBook '{title_to_borrow}' borrowed successfully.")
+            return
+    
+    print(f"\nBook '{title_to_borrow}' is not available for borrowing.")
+
+# Function to return a borrowed book
+def return_book(data):
+    display_books(data)
+    title_to_return = input("\nEnter the title of the book to return: ")
+
+    for book in data["books"]:
+        if book["title"].lower() == title_to_return.lower() and book["status"] == "Borrowed":
+            book["status"] = "Available"
+            save_data(data)
+            print(f"\nBook '{title_to_return}' returned successfully.")
+            return
+    
+    print(f"\nBook '{title_to_return}' is not marked as borrowed or does not exist.")
+
+# Main function to run the program
+def main():
+    data = load_data()
+
+    while True:
+        display_menu()
+
+        choice = input("\nEnter your choice (1-5): ")
+
+        if choice == "1":
+            display_books(data)
+        elif choice == "2":
+            add_book(data)
+        elif choice == "3":
+            borrow_book(data)
+        elif choice == "4":
+            return_book(data)
+        elif choice == "5":
+            print("\nExiting the Library Management System. Goodbye!")
+            break
+        else:
+            print("\nInvalid choice. Please enter a number from 1 to 5.")
+
+if __name__ == "__main__":
+    main()
